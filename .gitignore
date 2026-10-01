@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# Assignment brief (not to be pushed)
+docs/Fullstack Developer Intern Assignment - inMinutes.pdf
+
+# Agent instructions (not to be pushed)
+AGENTS.md
+CLAUDE.md
