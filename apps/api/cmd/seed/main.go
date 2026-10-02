@@ -19,12 +19,12 @@ type menuItem struct {
 }
 
 var menuItems = []menuItem{
-	{name: "Classic Burger", pricePaise: 899, stock: 12},
-	{name: "Crispy Chicken Burger", pricePaise: 999, stock: 8},
-	{name: "Margherita Pizza", pricePaise: 1099, stock: 6},
-	{name: "Loaded Fries", pricePaise: 499, stock: 10},
-	{name: "Caesar Salad", pricePaise: 699, stock: 5},
-	{name: "Chocolate Shake", pricePaise: 399, stock: 3},
+	{name: "Classic Burger", pricePaise: 24900, stock: 12},
+	{name: "Crispy Chicken Burger", pricePaise: 28900, stock: 8},
+	{name: "Margherita Pizza", pricePaise: 32900, stock: 6},
+	{name: "Loaded Fries", pricePaise: 14900, stock: 10},
+	{name: "Caesar Salad", pricePaise: 21900, stock: 5},
+	{name: "Chocolate Shake", pricePaise: 12900, stock: 3},
 }
 
 func main() {

@@ -43,7 +43,7 @@ Returns the menu and current stock counts.
 {
   "data": {
     "items": [
-      { "id": 1, "name": "Classic Burger", "pricePaise": 899, "stock": 12 }
+      { "id": 1, "name": "Classic Burger", "pricePaise": 24900, "stock": 12 }
     ]
   }
 }
@@ -79,7 +79,7 @@ An order response has this shape:
         "menuItemId": 1,
         "menuItemName": "Classic Burger",
         "quantity": 2,
-        "unitPricePaise": 899
+        "unitPricePaise": 24900
       }
     ],
     "createdAt": "2026-10-02T00:00:00Z",
