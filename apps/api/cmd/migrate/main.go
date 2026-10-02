@@ -9,11 +9,15 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 
+	"api/internal/config"
 	"api/internal/migrations"
 )
 
 func main() {
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+	if err := config.LoadDotEnv(); err != nil {
+		fatal("load .env", "err", err)
+	}
 
 	if len(os.Args) != 2 || (os.Args[1] != "up" && os.Args[1] != "down") {
 		slog.Error("usage: migrate <up|down>")

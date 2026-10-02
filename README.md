@@ -58,3 +58,7 @@ pnpm dev               # runs api and web in parallel
 The API build creates `apps/api/bin/migrate` and `apps/api/bin/seed`. With `DATABASE_URL` set, run `./bin/migrate up` to apply schema changes, `./bin/migrate down` to revert them, and `./bin/seed` to insert the initial menu. The seed command exits successfully with a `seed data already exists` log if menu data is present.
 
 See [docs/](docs/README.md) for architecture and API details.
+
+## Ordering and live updates
+
+Orders use a client-supplied `Idempotency-Key`, so a retry returns the original order without reducing stock twice. The API locks every requested menu row in one transaction, checks availability, and deducts stock with a conditional update; Postgres also rejects negative stock. After a successful commit, the SSE endpoint broadcasts menu stock and order events to customer and kitchen screens. See [the API reference](docs/api.md) for request formats and event names.

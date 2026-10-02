@@ -28,7 +28,7 @@ Copy `.env.example` to `.env`. Docker Compose reads it automatically; every valu
 | `POSTGRES_PORT`       | db (host)    | `5432`                                                      |
 | `API_PORT`            | api (host)   | `8080`                                                      |
 | `WEB_PORT`            | web (host)   | `3000`                                                      |
-| `DATABASE_URL`        | api          | built from the Postgres vars in Compose; required on host   |
+| `DATABASE_URL`        | api, migrate, seed | built from the Postgres vars in Compose; required on host   |
 | `PORT`                | api          | `8080`                                                      |
 | `NEXT_PUBLIC_API_URL` | web          | `http://localhost:8080` (inlined at build time)             |
 
@@ -36,3 +36,5 @@ Copy `.env.example` to `.env`. Docker Compose reads it automatically; every valu
 
 - `apps/api/Dockerfile`: multi-stage, static `api`, `migrate`, and `seed` binaries on Alpine. Build context `apps/api`. Migrations are embedded in the migration binary, so it can run from any working directory.
 - `apps/web/Dockerfile`: build context is the repo root so it can use `pnpm-lock.yaml`. Runs the Next.js standalone server.
+
+The Go binaries load `.env` from their working directory or the repository root when it exists. Container environment variables take precedence.

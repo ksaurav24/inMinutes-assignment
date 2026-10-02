@@ -5,6 +5,7 @@ go 1.27.1
 require (
 	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/jackc/pgx/v5 v5.11.0
+	github.com/joho/godotenv v1.5.1
 )
 
 require (

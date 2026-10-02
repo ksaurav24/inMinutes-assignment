@@ -8,6 +8,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"api/internal/config"
 )
 
 type menuItem struct {
@@ -27,6 +29,9 @@ var menuItems = []menuItem{
 
 func main() {
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+	if err := config.LoadDotEnv(); err != nil {
+		fatal("load .env", "err", err)
+	}
 
 	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {

@@ -7,6 +7,7 @@ type APIError struct {
 	Status  int    `json:"-"`
 	Code    string `json:"code"`
 	Message string `json:"message"`
+	Details any    `json:"details,omitempty"`
 }
 
 func (e *APIError) Error() string { return e.Message }
@@ -21,4 +22,8 @@ func BadRequest(message string) *APIError {
 
 func NotFound(message string) *APIError {
 	return NewError(http.StatusNotFound, "not_found", message)
+}
+
+func Conflict(code, message string, details any) *APIError {
+	return &APIError{Status: http.StatusConflict, Code: code, Message: message, Details: details}
 }
