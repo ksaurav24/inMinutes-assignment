@@ -86,4 +86,4 @@ DATABASE_URL='postgres://app:app@localhost:5432/app?sslmode=disable' pnpm --filt
 
 ## Submission demo
 
-[Watch the 10-second demo recording](docs/demo.mp4): two customers try the final unit; one succeeds, one sees the stock conflict, and the kitchen moves the order through all stages. Include this video link with the repository link in the submission email.
+[Watch the 43-second demo recording](docs/demo.mp4): two customers with multi-item carts order at once; one succeeds, while the other resolves a stock conflict and retries. The second chapter shows a new order appearing in the kitchen and each status update reaching the customer. The video has no audio. Include this video link with the repository link in the submission email.
