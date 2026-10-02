@@ -15,8 +15,9 @@ import (
 
 func main() {
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
-	if err := config.LoadDotEnv(); err != nil {
-		fatal("load .env", "err", err)
+	cfg, err := config.LoadEnv()
+	if err != nil {
+		fatal("load environment", "err", err)
 	}
 
 	if len(os.Args) != 2 || (os.Args[1] != "up" && os.Args[1] != "down") {
@@ -24,17 +25,12 @@ func main() {
 		os.Exit(2)
 	}
 
-	databaseURL := os.Getenv("DATABASE_URL")
-	if databaseURL == "" {
-		fatal("DATABASE_URL is required")
-	}
-
 	source, err := iofs.New(migrations.Files, ".")
 	if err != nil {
 		fatal("load migrations", "err", err)
 	}
 
-	migration, err := migrate.NewWithSourceInstance("iofs", source, databaseURL)
+	migration, err := migrate.NewWithSourceInstance("iofs", source, cfg.DatabaseURL)
 	if err != nil {
 		fatal("initialize migrations", "err", err)
 	}

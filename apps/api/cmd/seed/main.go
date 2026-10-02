@@ -29,19 +29,15 @@ var menuItems = []menuItem{
 
 func main() {
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
-	if err := config.LoadDotEnv(); err != nil {
-		fatal("load .env", "err", err)
-	}
-
-	databaseURL := os.Getenv("DATABASE_URL")
-	if databaseURL == "" {
-		fatal("DATABASE_URL is required")
+	cfg, err := config.LoadEnv()
+	if err != nil {
+		fatal("load environment", "err", err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	pool, err := pgxpool.New(ctx, databaseURL)
+	pool, err := pgxpool.New(ctx, cfg.DatabaseURL)
 	if err != nil {
 		fatal("connect db", "err", err)
 	}
