@@ -3,16 +3,9 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
-import { apiURL, queryKeys, type MenuItem, type Order } from "@/lib/api";
+import { apiURL, queryKeys } from "@/lib/api";
 
 type ConnectionState = "connecting" | "connected" | "reconnecting";
-
-function mergeOrder(orders: Order[] | undefined, nextOrder: Order) {
-	if (!orders) return [nextOrder];
-	const existingIndex = orders.findIndex((order) => order.id === nextOrder.id);
-	if (existingIndex === -1) return [...orders, nextOrder].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-	return orders.map((order) => (order.id === nextOrder.id ? nextOrder : order));
-}
 
 export function useLiveEvents() {
 	const queryClient = useQueryClient();
@@ -20,19 +13,19 @@ export function useLiveEvents() {
 
 	useEffect(() => {
 		const events = new EventSource(apiURL("/events"));
-		events.onopen = () => setConnectionState("connected");
+		events.onopen = () => {
+			setConnectionState("connected");
+			void queryClient.cancelQueries().then(() => queryClient.invalidateQueries());
+		};
 		events.onerror = () => setConnectionState("reconnecting");
 
-		const updateMenu = (event: MessageEvent<string>) => {
-			const menuItem = JSON.parse(event.data) as MenuItem;
-			queryClient.setQueryData<MenuItem[]>(queryKeys.menu, (items) =>
-				items?.map((item) => (item.id === menuItem.id ? menuItem : item))
-			);
+		const updateMenu = () => {
+			void queryClient.invalidateQueries({ queryKey: queryKeys.menu });
 		};
 		const updateOrder = (event: MessageEvent<string>) => {
-			const order = JSON.parse(event.data) as Order;
-			queryClient.setQueryData<Order>(queryKeys.order(order.id), order);
-			queryClient.setQueryData<Order[]>(queryKeys.kitchenOrders, (orders) => mergeOrder(orders, order));
+			const order = JSON.parse(event.data) as { id: number };
+			void queryClient.invalidateQueries({ queryKey: queryKeys.order(order.id) });
+			void queryClient.invalidateQueries({ queryKey: queryKeys.kitchenOrders });
 		};
 
 		events.addEventListener("menu.updated", updateMenu);

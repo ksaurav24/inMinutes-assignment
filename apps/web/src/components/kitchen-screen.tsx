@@ -72,7 +72,10 @@ export function KitchenScreen() {
       queryClient.setQueryData<Order[]>(queryKeys.kitchenOrders, (orders) => orders?.map((order) => order.id === updatedOrder.id ? updatedOrder : order));
       queryClient.setQueryData(queryKeys.order(updatedOrder.id), updatedOrder);
     },
-    onSettled: () => setActiveOrderID(null),
+    onSettled: () => {
+      setActiveOrderID(null);
+      queryClient.invalidateQueries({ queryKey: queryKeys.kitchenOrders });
+    },
   });
 
   function advance(order: Order) {

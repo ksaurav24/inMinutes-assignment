@@ -102,13 +102,13 @@ Returns all orders, oldest first, for the kitchen board.
 
 ## `PATCH /orders/{orderId}`
 
-Updates an order's kitchen status. Valid statuses are `new`, `cooking`, `ready`, and `picked_up`.
+Advances an order through `new` → `cooking` → `ready` → `picked_up`. The request must name the next stage. A stale kitchen screen cannot move an order backwards or skip a stage.
 
 ```json
 { "status": "cooking" }
 ```
 
-Returns the updated order, or `404 not_found` when it does not exist.
+Returns the updated order, `404 not_found` when it does not exist, or `409 order_status_conflict` when another screen already changed its stage.
 
 ## `GET /events`
 
@@ -118,4 +118,4 @@ An SSE stream for live updates. Events are emitted only after their database tra
 - `order.created`: a new order for the kitchen board
 - `order.updated`: an order after a kitchen status change
 
-Clients should load `/menu` or `/kitchen/orders` first, then keep this stream open and refetch after reconnecting.
+Clients should load `/menu` or `/kitchen/orders`, keep this stream open, and refetch when it connects or reconnects. Refetching also closes the gap between the initial load and stream subscription.

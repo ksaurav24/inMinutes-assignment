@@ -142,15 +142,20 @@ func (h *Handler) UpdateOrderStatus(w http.ResponseWriter, r *http.Request) {
 		httpx.Error(w, r, httpx.BadRequest(err.Error()))
 		return
 	}
-	if !validStatus(request.Status) {
-		httpx.Error(w, r, httpx.BadRequest("status must be new, cooking, ready, or picked_up"))
+	expectedStatus, ok := previousStatus(request.Status)
+	if !ok {
+		httpx.Error(w, r, httpx.BadRequest("status must be cooking, ready, or picked_up"))
 		return
 	}
 
-	order, err := h.store.UpdateOrderStatus(r.Context(), orderID, request.Status)
+	order, err := h.store.UpdateOrderStatus(r.Context(), orderID, expectedStatus, request.Status)
 	if err != nil {
 		if errors.Is(err, store.ErrOrderNotFound) {
 			httpx.Error(w, r, httpx.NotFound("order not found"))
+			return
+		}
+		if errors.Is(err, store.ErrOrderStatusConflict) {
+			httpx.Error(w, r, httpx.Conflict("order_status_conflict", "order status changed; refresh the board", nil))
 			return
 		}
 		serverError(w, r, err)
@@ -231,8 +236,17 @@ func orderID(w http.ResponseWriter, r *http.Request) (int64, bool) {
 	return id, true
 }
 
-func validStatus(status string) bool {
-	return status == "new" || status == "cooking" || status == "ready" || status == "picked_up"
+func previousStatus(status string) (string, bool) {
+	switch status {
+	case "cooking":
+		return "new", true
+	case "ready":
+		return "cooking", true
+	case "picked_up":
+		return "ready", true
+	default:
+		return "", false
+	}
 }
 
 func writeEvent(w http.ResponseWriter, event events.Event) error {

@@ -13,6 +13,7 @@ import (
 
 var (
 	ErrOrderNotFound        = errors.New("order not found")
+	ErrOrderStatusConflict  = errors.New("order status changed")
 	ErrIdempotencyKeyReused = errors.New("idempotency key was used with another request")
 )
 
@@ -226,16 +227,23 @@ func (s *Store) CreateOrder(ctx context.Context, idempotencyKey, requestHash str
 	return order, updatedMenuItems, true, nil
 }
 
-func (s *Store) UpdateOrderStatus(ctx context.Context, id int64, status string) (Order, error) {
+func (s *Store) UpdateOrderStatus(ctx context.Context, id int64, expectedStatus, status string) (Order, error) {
 	result, err := s.pool.Exec(ctx, `
 		UPDATE orders
 		SET status = $1, updated_at = NOW()
-		WHERE id = $2`, status, id)
+		WHERE id = $2 AND status = $3`, status, id, expectedStatus)
 	if err != nil {
 		return Order{}, err
 	}
 	if result.RowsAffected() == 0 {
-		return Order{}, ErrOrderNotFound
+		var exists bool
+		if err := s.pool.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM orders WHERE id = $1)`, id).Scan(&exists); err != nil {
+			return Order{}, err
+		}
+		if !exists {
+			return Order{}, ErrOrderNotFound
+		}
+		return Order{}, ErrOrderStatusConflict
 	}
 	return s.GetOrder(ctx, id)
 }

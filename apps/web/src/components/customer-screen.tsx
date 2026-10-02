@@ -28,26 +28,24 @@ function createIdempotencyKey() {
 }
 
 function readLastOrderID() {
-	const value = Number(window.localStorage.getItem(lastOrderStorageKey));
+	const value = Number(window.sessionStorage.getItem(lastOrderStorageKey));
 	return Number.isSafeInteger(value) && value > 0 ? value : null;
 }
 
 function subscribeToLastOrder(callback: () => void) {
-	window.addEventListener("storage", callback);
 	window.addEventListener(lastOrderStorageEvent, callback);
 	return () => {
-		window.removeEventListener("storage", callback);
 		window.removeEventListener(lastOrderStorageEvent, callback);
 	};
 }
 
 function saveLastOrderID(orderID: number) {
-	window.localStorage.setItem(lastOrderStorageKey, String(orderID));
+	window.sessionStorage.setItem(lastOrderStorageKey, String(orderID));
 	window.dispatchEvent(new Event(lastOrderStorageEvent));
 }
 
 function clearLastOrderID() {
-	window.localStorage.removeItem(lastOrderStorageKey);
+	window.sessionStorage.removeItem(lastOrderStorageKey);
 	window.dispatchEvent(new Event(lastOrderStorageEvent));
 }
 
