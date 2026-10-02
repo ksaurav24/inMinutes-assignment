@@ -14,9 +14,9 @@ docker-compose.yml
 
 ## Prerequisites
 
-- Node 26+ and pnpm 12+
-- Go 1.27+
-- Docker with Compose
+- Node 26.8.1 and pnpm 12.3.4
+- Go 1.27.1
+- Docker 29.7.2 with Compose 5.5.1
 
 ## Quick start (everything in Docker)
 
@@ -86,4 +86,4 @@ DATABASE_URL='postgres://app:app@localhost:5432/app?sslmode=disable' pnpm --filt
 
 ## Submission demo
 
-[Watch the 43-second demo recording](docs/demo.mp4): two customers with multi-item carts order at once; one succeeds, while the other resolves a stock conflict and retries. The second chapter shows a new order appearing in the kitchen and each status update reaching the customer. The video has no audio. Include this video link with the repository link in the submission email.
+[Watch the demo recording](docs/demo.mp4): two customers with multi-item carts order at once; one succeeds, while the other resolves a stock conflict and retries. The next chapters show customer-to-kitchen status tracking and two kitchen boards receiving the same order and stage changes. Small touch markers were added in editing to show the controls used; the chapters are separate captures. The video has no audio. Include this video link with the repository link in the submission email.
