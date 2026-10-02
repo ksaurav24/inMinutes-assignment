@@ -37,6 +37,8 @@ Run Postgres in Docker and the apps on the host:
 pnpm install
 pnpm db:up
 export DATABASE_URL=postgres://app:app@localhost:5432/app?sslmode=disable
+pnpm --filter api migrate up
+pnpm --filter api seed
 pnpm dev               # runs api and web in parallel
 ```
 
@@ -52,5 +54,7 @@ pnpm dev               # runs api and web in parallel
 | `pnpm db:up`   | Start only Postgres                   |
 | `pnpm up`      | Build and start the full stack        |
 | `pnpm down`    | Stop the stack                        |
+
+The API build creates `apps/api/bin/migrate` and `apps/api/bin/seed`. With `DATABASE_URL` set, run `./bin/migrate up` to apply schema changes, `./bin/migrate down` to revert them, and `./bin/seed` to insert the initial menu. The seed command exits successfully with a `seed data already exists` log if menu data is present.
 
 See [docs/](docs/README.md) for architecture and API details.

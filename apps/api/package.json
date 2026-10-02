@@ -3,8 +3,10 @@
   "private": true,
   "scripts": {
     "dev": "go run ./cmd/api",
-    "build": "go build -o bin/api ./cmd/api",
+    "build": "go build -o bin/api ./cmd/api && go build -o bin/migrate ./cmd/migrate && go build -o bin/seed ./cmd/seed",
     "lint": "go vet ./...",
+    "migrate": "go run ./cmd/migrate",
+    "seed": "go run ./cmd/seed",
     "test": "go test ./..."
   }
 }
