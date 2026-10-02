@@ -2,19 +2,22 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"api/internal/httpx"
 )
 
 func main() {
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		log.Fatal("DATABASE_URL is required")
+		fatal("DATABASE_URL is required")
 	}
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -23,26 +26,35 @@ func main() {
 
 	pool, err := pgxpool.New(context.Background(), dbURL)
 	if err != nil {
-		log.Fatalf("connect db: %v", err)
+		fatal("connect db", "err", err)
 	}
 	defer pool.Close()
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		httpx.Error(w, r, httpx.NotFound("route not found"))
+	})
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 		defer cancel()
 
-		status, code := "ok", http.StatusOK
 		if err := pool.Ping(ctx); err != nil {
-			status, code = "db unavailable", http.StatusServiceUnavailable
+			slog.WarnContext(ctx, "db ping failed", "err", err)
+			httpx.Error(w, r, httpx.NewError(http.StatusServiceUnavailable, "db_unavailable", "database unavailable"))
+			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(code)
-		json.NewEncoder(w).Encode(map[string]string{"status": status})
+		httpx.JSON(w, http.StatusOK, map[string]string{"status": "ok"})
 	})
 
-	log.Printf("api listening on :%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, withCORS(mux)))
+	slog.Info("api listening", "port", port)
+	if err := http.ListenAndServe(":"+port, httpx.LogRequests(withCORS(mux))); err != nil {
+		fatal("server stopped", "err", err)
+	}
+}
+
+func fatal(msg string, args ...any) {
+	slog.Error(msg, args...)
+	os.Exit(1)
 }
 
 // withCORS allows the web app (different origin in local dev) to call the API.
