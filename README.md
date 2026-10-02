@@ -86,4 +86,4 @@ DATABASE_URL='postgres://app:app@localhost:5432/app?sslmode=disable' pnpm --filt
 
 ## Submission demo
 
-[Watch the demo recording](docs/demo.mp4): two customers with multi-item carts order at once; one succeeds, while the other resolves a stock conflict and retries. The next chapters show customer-to-kitchen status tracking and two kitchen boards receiving the same order and stage changes. Small touch markers were added in editing to show the controls used; the chapters are separate captures. The video has no audio. Include this video link with the repository link in the submission email.
+[Watch the demo recording](https://res.cloudinary.com/apexlabs/video/upload/v1790927496/demo_fnd3lu.mp4): two customers with multi-item carts order at once; one succeeds, while the other resolves a stock conflict and retries. The next chapters show customer-to-kitchen status tracking and two kitchen boards receiving the same order and stage changes. Small touch markers were added in editing to show the controls used; the chapters are separate captures. The video has no audio. Include this video link with the repository link in the submission email.
